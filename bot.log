@@ -19,3 +19,13 @@
 2024-12-29T13:22:59.617Z [ERROR]: Polling error: ETELEGRAM: 409 Conflict: terminated by other getUpdates request; make sure that only one bot instance is running
 2024-12-29T13:37:24.521Z [INFO]: Bot started
 2024-12-29T13:37:24.527Z [INFO]: Bot started
+2024-12-29T14:23:20.215Z [INFO]: Bot started
+2024-12-29T14:23:20.213Z [INFO]: Bot started
+2024-12-29T14:23:24.225Z [ERROR]: Polling error: ETELEGRAM: 409 Conflict: terminated by other getUpdates request; make sure that only one bot instance is running
+2024-12-29T14:33:09.229Z [INFO]: Bot started
+2024-12-29T14:33:09.230Z [INFO]: Bot started
+2024-12-29T14:46:56.007Z [INFO]: Bot started
+2024-12-29T14:46:56.018Z [INFO]: Bot started
+2024-12-29T14:47:00.727Z [ERROR]: Polling error: ETELEGRAM: 409 Conflict: terminated by other getUpdates request; make sure that only one bot instance is running
+2024-12-29T14:47:04.154Z [ERROR]: Polling error: ETELEGRAM: 409 Conflict: terminated by other getUpdates request; make sure that only one bot instance is running
+2024-12-29T14:59:37.183Z [INFO]: Bot started

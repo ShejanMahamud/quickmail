@@ -1,6 +1,3 @@
-Here’s a sample `README.md` file for your GitHub repository:
-
-````markdown
 # QuickMail Bot
 
 QuickMail Bot is a Telegram bot that provides temporary email services. It allows users to generate temporary emails, check their inbox, read emails, and download attachments. Built using Node.js, this bot utilizes the `node-telegram-bot-api` library for interacting with Telegram's API, and `axios` for making HTTP requests to a temporary email service API.
@@ -29,7 +26,7 @@ To run this bot locally, ensure you have the following installed:
    git clone https://github.com/yourusername/quickmail-bot.git
    cd quickmail-bot
    ```
-````
+
 
 2. Install the dependencies:
 
@@ -80,7 +77,3 @@ This project is licensed under the MIT License - see the [LICENSE](LICENSE) file
 - [axios](https://github.com/axios/axios) for making HTTP requests.
 - [winston](https://github.com/winstonjs/winston) for logging.
 
-```
-
-Replace `ShejanMahamud` in the repository URL with your actual GitHub username.
-```

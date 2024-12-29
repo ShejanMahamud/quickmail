@@ -4,7 +4,23 @@ const fs = require('fs');
 const path = require('path');
 const dotenv = require('dotenv');
 const winston = require('winston');
+
+// Logger Initialization
+const logger = winston.createLogger({
+  level: 'info',
+  format: winston.format.combine(
+    winston.format.timestamp(),
+    winston.format.printf(({ timestamp, level, message }) => `${timestamp} [${level.toUpperCase()}]: ${message}`)
+  ),
+  transports: [
+    new winston.transports.Console(),
+    new winston.transports.File({ filename: 'bot.log' }),
+  ],
+});
+
+// Load environment variables
 dotenv.config();
+
 // Replace with your Telegram bot token
 const BOT_TOKEN = process.env.BOT_TOKEN;
 const bot = new TelegramBot(BOT_TOKEN, { polling: true });
@@ -14,6 +30,7 @@ const API_BASE_URL = 'https://www.1secmail.com/api/v1/';
 
 let userSelectedDomain = {};
 
+// Bot start handler
 bot.onText(/\/start/, (msg) => {
   const chatId = msg.chat.id;
   const keyboard = [
@@ -52,6 +69,7 @@ bot.onText(/\/generate/, async (msg) => {
       bot.sendMessage(chatId, `Generated random email: ${email}`);
     }
   } catch (error) {
+    logger.error(`Error in /generate: ${error.message}`);
     bot.sendMessage(chatId, 'Failed to generate an email. Please try again later.');
   }
 });
@@ -77,6 +95,7 @@ bot.onText(/\/domains/, async (msg) => {
       }
     });
   } catch (error) {
+    logger.error(`Error in /domains: ${error.message}`);
     bot.sendMessage(chatId, 'Failed to fetch domains. Please try again later.');
   }
 });
@@ -103,6 +122,7 @@ bot.onText(/\/check (.+)/, async (msg, match) => {
       bot.sendMessage(chatId, `Messages:\n\n${messageList}`);
     }
   } catch (error) {
+    logger.error(`Error in /check: ${error.message}`);
     bot.sendMessage(chatId, 'Failed to fetch messages. Please try again later.');
   }
 });
@@ -133,6 +153,7 @@ bot.onText(/\/read (.+)/, async (msg, match) => {
 
     bot.sendMessage(chatId, messageDetails);
   } catch (error) {
+    logger.error(`Error in /read: ${error.message}`);
     bot.sendMessage(chatId, 'Failed to fetch the email. Please try again later.');
   }
 });
@@ -168,26 +189,15 @@ bot.onText(/\/download (.+)/, async (msg, match) => {
       bot.sendMessage(chatId, 'Failed to download the attachment.');
     });
   } catch (error) {
+    logger.error(`Error in /download: ${error.message}`);
     bot.sendMessage(chatId, 'Failed to download the attachment. Please try again later.');
   }
 });
 
+// Polling error handler
 bot.on('polling_error', (error) => {
   logger.error(`Polling error: ${error.message}`);
 });
 
-const logger = winston.createLogger({
-  level: 'info',
-  format: winston.format.combine(
-    winston.format.timestamp(),
-    winston.format.printf(({ timestamp, level, message }) => `${timestamp} [${level.toUpperCase()}]: ${message}`)
-  ),
-  transports: [
-    new winston.transports.Console(),
-    new winston.transports.File({ filename: 'bot.log' }),
-  ],
-});
-
 // Example of logging
 logger.info('Bot started');
-logger.error('An error occurred');

@@ -35,24 +35,90 @@ bot.onText(/\/start/, (msg) => {
   const chatId = msg.chat.id;
   const keyboard = [
     [
-      { text: '/generate - Generate a random temporary email', callback_data: '/generate' },
-      { text: '/domains - Get the list of active domains', callback_data: '/domains' },
+      { text: 'Generate', callback_data: '/generate' },
+      { text: 'Domains', callback_data: '/domains' },
     ],
     [
-      { text: '/check - Check your mailbox', callback_data: '/check' },
-      { text: '/read - Read an email', callback_data: '/read' },
+      { text: 'Check', callback_data: '/check' },
+      { text: 'Read', callback_data: '/read' },
     ],
     [
-      { text: '/download - Download an attachment', callback_data: '/download' },
+      { text: 'Download', callback_data: '/download' },
     ]
   ];
   
-  bot.sendMessage(chatId, 'Welcome to TempMail Bot!\n\nChoose a command:', {
+  bot.sendMessage(chatId, `Welcome to QuickMail Bot!\n\nCommands:\n` +
+    `/generate - Generate a random temporary email\n` +
+    `/domains - Get the list of active domains and choose one\n` +
+    `/check - Check your mailbox (provide email)\n` +
+    `/read - Read an email (provide email and message ID)\n` +
+    `/download - Download an attachment (provide email, message ID, and filename)`, {
     reply_markup: {
       inline_keyboard: keyboard,
     },
   });
 });
+
+bot.on('callback_query', async (query) => {
+  const chatId = query.message.chat.id;
+  const data = query.data;
+
+  if (data === '/generate') {
+    await generateEmail(chatId);
+  } else if (data === '/domains') {
+    await getDomains(chatId);
+  } else if (data === '/check') {
+    bot.sendMessage(chatId, 'Send your email address to check your mailbox. Example: /check username@domain');
+  } else if (data === '/read') {
+    bot.sendMessage(chatId, 'Send your email and message ID to read an email. Example: /read username@domain message_id');
+  } else if (data === '/download') {
+    bot.sendMessage(chatId, 'Send email, message ID, and filename to download an attachment. Example: /download username@domain message_id filename');
+  }
+});
+
+// Generate random email addresses or allow user to choose a domain
+async function generateEmail(chatId) {
+  try {
+    if (userSelectedDomain[chatId]) {
+      const domain = userSelectedDomain[chatId];
+      const username = Math.random().toString(36).substring(2, 12);
+      const email = `${username}@${domain}`;
+      bot.sendMessage(chatId, `Generated email: ${email}`);
+    } else {
+      const response = await axios.get(`${API_BASE_URL}?action=genRandomMailbox&count=1`);
+      const email = response.data[0];
+      bot.sendMessage(chatId, `Generated random email: ${email}`);
+    }
+  } catch (error) {
+    logger.error(`Error in /generate: ${error.message}`);
+    bot.sendMessage(chatId, 'Failed to generate an email. Please try again later.');
+  }
+}
+
+// Get the list of active domains and allow the user to choose one
+async function getDomains(chatId) {
+  try {
+    const response = await axios.get(`${API_BASE_URL}?action=getDomainList`);
+    const domains = response.data;
+    const domainList = domains.map((domain, index) => `${index + 1}. ${domain}`).join('\n');
+
+    bot.sendMessage(chatId, `Active domains:\n${domainList}\n\nReply with /select <number> to choose a domain.`);
+
+    bot.once('message', (reply) => {
+      const selected = parseInt(reply.text.split(' ')[1]);
+
+      if (selected > 0 && selected <= domains.length) {
+        userSelectedDomain[chatId] = domains[selected - 1];
+        bot.sendMessage(chatId, `You selected: ${domains[selected - 1]}`);
+      } else {
+        bot.sendMessage(chatId, 'Invalid selection. Please try again.');
+      }
+    });
+  } catch (error) {
+    logger.error(`Error in /domains: ${error.message}`);
+    bot.sendMessage(chatId, 'Failed to fetch domains. Please try again later.');
+  }
+}
 
 // Generate random email addresses or allow user to choose a domain
 bot.onText(/\/generate/, async (msg) => {

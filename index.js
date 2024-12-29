@@ -15,12 +15,26 @@ const API_BASE_URL = 'https://www.1secmail.com/api/v1/';
 let userSelectedDomain = {};
 
 bot.onText(/\/start/, (msg) => {
-  bot.sendMessage(msg.chat.id, `Welcome to TempMail Bot!\n\nCommands:\n` +
-    `/generate - Generate a random temporary email\n` +
-    `/domains - Get the list of active domains and choose one\n` +
-    `/check - Check your mailbox (provide email)\n` +
-    `/read - Read an email (provide email and message ID)\n` +
-    `/download - Download an attachment (provide email, message ID, and filename)`);
+  const chatId = msg.chat.id;
+  const keyboard = [
+    [
+      { text: '/generate - Generate a random temporary email', callback_data: '/generate' },
+      { text: '/domains - Get the list of active domains', callback_data: '/domains' },
+    ],
+    [
+      { text: '/check - Check your mailbox', callback_data: '/check' },
+      { text: '/read - Read an email', callback_data: '/read' },
+    ],
+    [
+      { text: '/download - Download an attachment', callback_data: '/download' },
+    ]
+  ];
+  
+  bot.sendMessage(chatId, 'Welcome to TempMail Bot!\n\nChoose a command:', {
+    reply_markup: {
+      inline_keyboard: keyboard,
+    },
+  });
 });
 
 // Generate random email addresses or allow user to choose a domain
@@ -157,21 +171,23 @@ bot.onText(/\/download (.+)/, async (msg, match) => {
     bot.sendMessage(chatId, 'Failed to download the attachment. Please try again later.');
   }
 });
-bot.on('polling_error', (error) => {
-    logger.error(`Polling error: ${error.message}`);
-  });
-const logger = winston.createLogger({
-    level: 'info',
-    format: winston.format.combine(
-      winston.format.timestamp(),
-      winston.format.printf(({ timestamp, level, message }) => `${timestamp} [${level.toUpperCase()}]: ${message}`)
-    ),
-    transports: [
-      new winston.transports.Console(),
-      new winston.transports.File({ filename: 'bot.log' })
-    ],
-  });
 
-  // Example of logging
+bot.on('polling_error', (error) => {
+  logger.error(`Polling error: ${error.message}`);
+});
+
+const logger = winston.createLogger({
+  level: 'info',
+  format: winston.format.combine(
+    winston.format.timestamp(),
+    winston.format.printf(({ timestamp, level, message }) => `${timestamp} [${level.toUpperCase()}]: ${message}`)
+  ),
+  transports: [
+    new winston.transports.Console(),
+    new winston.transports.File({ filename: 'bot.log' }),
+  ],
+});
+
+// Example of logging
 logger.info('Bot started');
 logger.error('An error occurred');
